@@ -24,7 +24,7 @@
 #define LOG 19
 #define MOD 2
 
-// ERRORS
+// errors
 #define STACK_OVERFLOW -100
 #define STACK_UNDERFLOW -101
 

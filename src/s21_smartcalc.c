@@ -228,10 +228,10 @@ int parser(lexems** head, char* str) {
 }
 
 double calcLogic(lexems** numList, lexems** list) {
-  if (*numList == NULL || list == NULL) {
-    exit(STACK_UNDERFLOW);
-  }
   double firstNum = 0, secondNum = 0, res = 0;
+  if (*numList == NULL || list == NULL) {
+    return res;
+  }
   int mod = 0;
   if (*list != NULL) mod = (*list)->val;
   firstNum = popDouble(numList);
@@ -240,7 +240,11 @@ double calcLogic(lexems** numList, lexems** list) {
     symb = popInt(list);
     return firstNum;
   } else {
-    secondNum = popDouble(numList);
+    if (mod == 3 && (*numList == NULL || (*numList)->val == 0)) {
+      return res;
+    } else {
+      secondNum = popDouble(numList);
+    }
   }
   if (symb == '+')
     res = secondNum + firstNum;
@@ -339,3 +343,9 @@ double calculate(char* str) {
   popDouble(&numList);
   return res;
 }
+
+// int main(void) {
+//   char str[10] = "1mod";
+//   printf("%s", calculate(str));
+//   return 0;
+// }

@@ -9,14 +9,15 @@
 int curs = 0, dot = 0, symb = 0;
 
 qtCalc::qtCalc(QWidget *parent) : QMainWindow(parent), ui(new Ui::qtCalc) {
-  //    QLocale lo(QLocale::C);
-  //    lo.setNumberOptions(QLocale::RejectGroupSeparator);
+  QLocale lo(QLocale::C);
+  lo.setNumberOptions(QLocale::RejectGroupSeparator);
   auto val = new QDoubleValidator();
-  //    val->setLocale(lo);
+  val->setLocale(lo);
 
   ui->setupUi(this);
 
   ui->resultShow->setValidator(val);
+  ui->xRes->setValidator(val);
 
   graphWindow = new graph;
 
@@ -54,16 +55,15 @@ qtCalc::qtCalc(QWidget *parent) : QMainWindow(parent), ui(new Ui::qtCalc) {
   connect(ui->dot, SIGNAL(clicked()), this, SLOT(dotClick()));
 
   connect(ui->CE, SIGNAL(clicked()), this, SLOT(ceClick()));
-  connect(ui->AC, SIGNAL(clicked()), this, SLOT(acClick()));
 
-  //  connect(ui->graph, SIGNAL(clicked()), this, SLOT(on_graph_clicked()));
+//  connect(ui->graph, SIGNAL(clicked()), this, SLOT(on_graph_clicked()));
   connect(this, &qtCalc::sendData, graphWindow, &graph::getData);
 }
 
 qtCalc::~qtCalc() { delete ui; }
 
 void qtCalc::initCalc() {
-  if (ui->resultShow->text() == "ERROR") {
+  if (ui->resultShow->text() == "0 ") {
     ui->resultShow->clear();
     dot = 0;
     curs = 0;
@@ -118,16 +118,12 @@ void qtCalc::equalClick() {
   initCalc();
   QString calc = ui->resultShow->text(), num;
 
-  if (ui->resultShow->text().contains(" X=", Qt::CaseInsensitive)) {
-    int i = calc.length() - calc.indexOf("=") - 1;
-    num = calc.right(i);
-    calc = calc.left(calc.indexOf("=") - 2);
-    if (calc.contains('X')) {
-      calc = calc.replace('X', num);
-    } else {
-      ui->resultShow->setText("ERROR");
-      return;
-    }
+  if (calc.contains("X", Qt::CaseInsensitive)) {
+    num = ui->xRes->text();
+    calc = calc.replace("X", num);
+  } else {
+    ui->resultShow->setText("0 ");
+    return;
   }
   if (calc.left(1) == "+") calc.replace("+", "");
   QByteArray byte = calc.toLocal8Bit();
@@ -142,7 +138,7 @@ void qtCalc::equalClick() {
 #endif
     ui->resultShow->setText(resCalc);
   } else {
-    ui->resultShow->setText("ERROR");
+    ui->resultShow->setText("0 ");
   }
 }
 
@@ -153,13 +149,6 @@ void qtCalc::ceClick() {
   dot = 0;
   symb = 0;
   curs = 0;
-}
-
-void qtCalc::acClick() {
-  initCalc();
-  if (!ui->resultShow->text().contains(" X=", Qt::CaseInsensitive)) {
-    ui->resultShow->setText(ui->resultShow->text() + " X=");
-  }
 }
 
 void qtCalc::on_credit_clicked() {
@@ -181,14 +170,13 @@ void qtCalc::on_open_clicked() {
 
 void qtCalc::on_graph_clicked() {
   initCalc();
-  if (ui->resultShow->text().contains('X', Qt::CaseInsensitive) &&
-      !ui->resultShow->text().contains('=', Qt::CaseInsensitive)) {
+  if (ui->resultShow->text().contains("X", Qt::CaseInsensitive)) {
     //    graphWindow = new graph(graphWindow);
     emit sendData(ui->resultShow->text());
     graphWindow->show();
     graphWindow->on_pushButton_clicked();
   } else {
-    ui->resultShow->setText("ERROR");
+    ui->resultShow->setText("0 ");
   }
 }
 

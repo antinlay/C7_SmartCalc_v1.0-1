@@ -42,7 +42,6 @@ class qtCalc : public QMainWindow {
   void dotClick();
   void equalClick();
   void ceClick();
-  void acClick();
   void on_credit_clicked();
   void on_debit_clicked();
   void on_open_clicked();
