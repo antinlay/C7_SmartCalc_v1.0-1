@@ -257,7 +257,7 @@ double calcLogic(lexems** numList, lexems** list) {
   else if (symb == '^')
     res = pow(secondNum, firstNum);
   else if (mod == 3)
-    res = (int)secondNum % (int)firstNum;
+    res = remainder(secondNum, firstNum);
   return res;
 }
 

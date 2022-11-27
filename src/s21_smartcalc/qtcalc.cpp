@@ -94,11 +94,11 @@ void qtCalc::symbs() {
   initCalc();
   QPushButton *button = (QPushButton *)sender();
   QString allStrings;
-  if (!symb) {
-    allStrings = (ui->resultShow->text()) + button->text();
-    ui->resultShow->setText(allStrings);
-    symb++;
-  }
+      if (!symb) {
+        allStrings = (ui->resultShow->text()) + button->text();
+        ui->resultShow->setText(allStrings);
+        symb++;
+      }
   if (dot) dot--;
 }
 
@@ -140,6 +140,9 @@ void qtCalc::equalClick() {
   } else {
     ui->resultShow->setText("0 ");
   }
+  dot = 0;
+  symb = 0;
+  curs = 0;
 }
 
 void qtCalc::ceClick() {
