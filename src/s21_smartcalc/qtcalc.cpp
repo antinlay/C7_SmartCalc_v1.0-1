@@ -6,7 +6,7 @@
 #include "graph.h"
 #include "qobjectdefs.h"
 
-int curs = 0, dot = 0, symb = 0;
+int ox = 0, dot = 0, symb = 0, clos = 0, open = 0;
 
 qtCalc::qtCalc(QWidget *parent) : QMainWindow(parent), ui(new Ui::qtCalc) {
   QLocale lo(QLocale::C);
@@ -48,15 +48,15 @@ qtCalc::qtCalc(QWidget *parent) : QMainWindow(parent), ui(new Ui::qtCalc) {
   connect(ui->sub, SIGNAL(clicked()), this, SLOT(symbs()));
   connect(ui->pow, SIGNAL(clicked()), this, SLOT(symbs()));
   connect(ui->mod, SIGNAL(clicked()), this, SLOT(symbs()));
-  //    connect(ui->open, SIGNAL(clicked()), this, SLOT(symbs()));
-  //    connect(ui->close, SIGNAL(clicked()), this, SLOT(symbs()));
-
+//  connect(ui->open, SIGNAL(clicked()), this, SLOT(symbs()));
+//  connect(ui->close, SIGNAL(clicked()), this, SLOT(symbs()));
+//  connect(ui->xoy, SIGNAL(clicked()), this, SLOT(symbs()));
   connect(ui->equal, SIGNAL(clicked()), this, SLOT(equalClick()));
   connect(ui->dot, SIGNAL(clicked()), this, SLOT(dotClick()));
 
   connect(ui->CE, SIGNAL(clicked()), this, SLOT(ceClick()));
 
-//  connect(ui->graph, SIGNAL(clicked()), this, SLOT(on_graph_clicked()));
+  //  connect(ui->graph, SIGNAL(clicked()), this, SLOT(on_graph_clicked()));
   connect(this, &qtCalc::sendData, graphWindow, &graph::getData);
 }
 
@@ -66,8 +66,10 @@ void qtCalc::initCalc() {
   if (ui->resultShow->text() == "0 ") {
     ui->resultShow->clear();
     dot = 0;
-    curs = 0;
+    ox = 0;
     symb = 0;
+    open = 0;
+    clos = 0;
   }
 }
 
@@ -77,7 +79,8 @@ void qtCalc::mathFuncs() {
   QString allStrings;
   allStrings = (ui->resultShow->text() + button->text());
   ui->resultShow->setText(allStrings + '(');
-  curs++;
+  open++;
+  symb++;
   if (dot) dot--;
 }
 
@@ -94,12 +97,12 @@ void qtCalc::symbs() {
   initCalc();
   QPushButton *button = (QPushButton *)sender();
   QString allStrings;
-      if (!symb) {
-        allStrings = (ui->resultShow->text()) + button->text();
-        ui->resultShow->setText(allStrings);
-        symb++;
-      }
-  if (dot) dot--;
+  if (!symb) {
+    allStrings = (ui->resultShow->text()) + button->text();
+    ui->resultShow->setText(allStrings);
+    symb++;
+    if (dot) dot--;
+  }
 }
 
 void qtCalc::dotClick() {
@@ -111,26 +114,34 @@ void qtCalc::dotClick() {
 #endif
     ui->resultShow->setText(ui->resultShow->text() + point);
     dot++;
+    symb++;
   }
 }
 
 void qtCalc::equalClick() {
   initCalc();
   QString calc = ui->resultShow->text(), num;
-
-  if (calc.contains("X", Qt::CaseInsensitive)) {
-    num = ui->xRes->text();
-    calc = calc.replace("X", num);
-  } else {
-    ui->resultShow->setText("0 ");
-    return;
-  }
-  if (calc.left(1) == "+") calc.replace("+", "");
   QByteArray byte = calc.toLocal8Bit();
   double result = 0;
   char *str = byte.data();
 
-  if (validAriphSymb(str)) {
+  if (calc.left(1) == "+") calc.replace("+", "");
+
+  if (calc.contains("X", Qt::CaseInsensitive)) {
+    num = ui->xRes->text();
+    calc = calc.replace("X", num);
+    str = calc.toLocal8Bit().data();
+    if (validAriphSymb(str)) {
+      result = calculate(str);
+      QString resCalc = QString::number(result, 'g', 14);
+#ifdef linux
+      resCalc.replace('.', ',');
+#endif
+      ui->resultShow->setText(resCalc);
+    } else {
+      ui->resultShow->setText("0 ");
+    }
+  } else if (validAriphSymb(str)) {
     result = calculate(str);
     QString resCalc = QString::number(result, 'g', 14);
 #ifdef linux
@@ -142,7 +153,7 @@ void qtCalc::equalClick() {
   }
   dot = 0;
   symb = 0;
-  curs = 0;
+  ox = 0;
 }
 
 void qtCalc::ceClick() {
@@ -151,7 +162,7 @@ void qtCalc::ceClick() {
   }
   dot = 0;
   symb = 0;
-  curs = 0;
+  ox = 0;
 }
 
 void qtCalc::on_credit_clicked() {
@@ -168,13 +179,15 @@ void qtCalc::on_open_clicked() {
   initCalc();
   if (!dot) {
     ui->resultShow->setText(ui->resultShow->text() + "(");
+    open++;
+    symb++;
+    if (ox) ox--;
   }
 }
 
 void qtCalc::on_graph_clicked() {
   initCalc();
   if (ui->resultShow->text().contains("X", Qt::CaseInsensitive)) {
-    //    graphWindow = new graph(graphWindow);
     emit sendData(ui->resultShow->text());
     graphWindow->show();
     graphWindow->on_pushButton_clicked();
@@ -185,16 +198,18 @@ void qtCalc::on_graph_clicked() {
 
 void qtCalc::on_xoy_clicked() {
   initCalc();
-  if (!dot) {
+  if (!ox) {
     ui->resultShow->setText(ui->resultShow->text() + "X");
+    ox++;
+    if (symb) symb--;
   }
-  symb--;
   emit sendData(ui->resultShow->text());
 }
 
 void qtCalc::on_close_clicked() {
   initCalc();
-  if (!dot) {
+  if (!dot && open) {
     ui->resultShow->setText(ui->resultShow->text() + ")");
+    open--;
   }
 }
