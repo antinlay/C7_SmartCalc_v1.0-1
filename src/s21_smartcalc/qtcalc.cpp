@@ -6,7 +6,7 @@
 #include "graph.h"
 #include "qobjectdefs.h"
 
-int ox = 0, dot = 0, symb = 0, clos = 0, open = 0;
+int ox = 0, dot = 0, symb = 0, open = 0;
 
 qtCalc::qtCalc(QWidget *parent) : QMainWindow(parent), ui(new Ui::qtCalc) {
   QLocale lo(QLocale::C);
@@ -48,9 +48,9 @@ qtCalc::qtCalc(QWidget *parent) : QMainWindow(parent), ui(new Ui::qtCalc) {
   connect(ui->sub, SIGNAL(clicked()), this, SLOT(symbs()));
   connect(ui->pow, SIGNAL(clicked()), this, SLOT(symbs()));
   connect(ui->mod, SIGNAL(clicked()), this, SLOT(symbs()));
-//  connect(ui->open, SIGNAL(clicked()), this, SLOT(symbs()));
-//  connect(ui->close, SIGNAL(clicked()), this, SLOT(symbs()));
-//  connect(ui->xoy, SIGNAL(clicked()), this, SLOT(symbs()));
+  //  connect(ui->open, SIGNAL(clicked()), this, SLOT(symbs()));
+  //  connect(ui->close, SIGNAL(clicked()), this, SLOT(symbs()));
+  //  connect(ui->xoy, SIGNAL(clicked()), this, SLOT(symbs()));
   connect(ui->equal, SIGNAL(clicked()), this, SLOT(equalClick()));
   connect(ui->dot, SIGNAL(clicked()), this, SLOT(dotClick()));
 
@@ -69,7 +69,6 @@ void qtCalc::initCalc() {
     ox = 0;
     symb = 0;
     open = 0;
-    clos = 0;
   }
 }
 
@@ -82,6 +81,7 @@ void qtCalc::mathFuncs() {
   open++;
   symb++;
   if (dot) dot--;
+  if (ox) ox--;
 }
 
 void qtCalc::numFuncs() {
@@ -91,6 +91,7 @@ void qtCalc::numFuncs() {
   newString = (ui->resultShow->text() + button->text());
   ui->resultShow->setText(newString);
   if (symb) symb--;
+  if (ox) ox--;
 }
 
 void qtCalc::symbs() {
@@ -102,6 +103,7 @@ void qtCalc::symbs() {
     ui->resultShow->setText(allStrings);
     symb++;
     if (dot) dot--;
+    if (ox) ox--;
   }
 }
 
@@ -120,6 +122,9 @@ void qtCalc::dotClick() {
 
 void qtCalc::equalClick() {
   initCalc();
+  while (open) {
+      on_close_clicked();
+  }
   QString calc = ui->resultShow->text(), num;
   QByteArray byte = calc.toLocal8Bit();
   double result = 0;
@@ -211,5 +216,6 @@ void qtCalc::on_close_clicked() {
   if (!dot && open) {
     ui->resultShow->setText(ui->resultShow->text() + ")");
     open--;
+    if (symb) symb--;
   }
 }
