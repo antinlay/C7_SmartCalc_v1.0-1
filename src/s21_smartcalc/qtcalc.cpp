@@ -132,7 +132,7 @@ void qtCalc::equalClick() {
 
   if (calc.left(1) == "+") calc.replace("+", "");
 
-  if (calc.contains("X", Qt::CaseInsensitive)) {
+  if (calc.contains("X", Qt::CaseInsensitive) && ui->xRes->text() != "") {
     num = ui->xRes->text();
     calc = calc.replace("X", num);
     str = calc.toLocal8Bit().data();

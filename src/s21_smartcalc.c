@@ -72,7 +72,10 @@ int findSymbOnLexem(char symb) {
 
 int findDigitOnLexem(char symb) {
   int err = 0;
-  char* str = ".,0123456789";
+  char* str = ".0123456789";
+#ifdef __linux__
+  str = ".,0123456789";
+#endif
   if (checkSymbOnLexem(str, symb)) err = symb;
   return err;
 }

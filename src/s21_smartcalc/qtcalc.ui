@@ -527,7 +527,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="xRes"/>
+      <widget class="QLineEdit" name="xRes">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
