@@ -123,7 +123,7 @@ void qtCalc::dotClick() {
 void qtCalc::equalClick() {
   initCalc();
   while (open) {
-      on_close_clicked();
+    on_close_clicked();
   }
   QString calc = ui->resultShow->text(), num;
   QByteArray byte = calc.toLocal8Bit();
