@@ -23,7 +23,6 @@ ifeq ($(OS), Linux)
 endif
 ifeq ($(OS), Darwin)
 	mv s21_smartcalc/s21_smartcalc.app build
-	chmod 755 build/s21_smartcalc.app
 	cd build && ./s21_smartcalc.app
 endif
 
