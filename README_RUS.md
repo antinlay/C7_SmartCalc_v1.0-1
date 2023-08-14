@@ -48,4 +48,4 @@
     - Перекладываем оператор из стека в выходную очередь.
 
 
-![Calc 2.0](https://github.com/antinlay/CPP3_SmartCalc_v2.0-1)
+[Calc 2.0](https://github.com/antinlay/CPP3_SmartCalc_v2.0-1)
